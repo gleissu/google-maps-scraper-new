@@ -1,0 +1,32 @@
+version: '3.7'
+
+services:
+  google-maps-scraper:
+    # A imagem será puxada do repositório Git configurado no Portainer
+    build: ./google-maps-scraper
+    networks:
+      - minha_rede
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.google-maps-scraper.rule=Host(`google-maps-scraper.involve.services`)"
+      - "traefik.http.routers.google-maps-scraper.entrypoints=web"
+      - "traefik.http.routers.google-maps-scraper.priority=1"
+      - "traefik.http.routers.google-maps-scraper.tls.certresolver=letsencryptresolver"
+      - "traefik.http.routers.google-maps-scraper.service=google-maps-scraper"
+      - "traefik.http.services.google-maps-scraper.loadbalancer.server.port=80"
+      - "traefik.http.services.google-maps-scraper.loadbalancer.passHostHeader=true"
+
+networks:
+  minha_rede:
+    external: true
+    name: minha_rede
